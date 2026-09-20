@@ -43,6 +43,10 @@ class YiCameraController(
             eventCollectorJob = scope.launch { collectPushEvents() }
             token = requestToken()
             val settings = fetchAllSettings()
+            // The camera may already be recording from before this app (re)connected to it
+            // (e.g. started from the physical shutter button, or a previous app session) —
+            // reflect that instead of assuming a fresh, idle camera.
+            _isRecording.value = settings[YiProtocol.KEY_APP_STATUS]?.contains("record", ignoreCase = true) == true
             _connectionState.value = CameraConnectionState.Connected(settings)
             refreshBattery()
         } catch (e: Exception) {
@@ -96,6 +100,15 @@ class YiCameraController(
             it.optInt("msg_id") == YiProtocol.MSG_GET_BATTERY
         }
         _batteryPercent.value = reply.optString("param").toIntOrNull()
+    }
+
+    /** Free space left on the SD card, in bytes. */
+    suspend fun getFreeStorageBytes(): Long {
+        val request = baseRequest(YiProtocol.MSG_GET_STORAGE_SPACE).put("type", YiProtocol.STORAGE_FREE)
+        val reply = client.sendCommand(request) {
+            it.optInt("msg_id") == YiProtocol.MSG_GET_STORAGE_SPACE
+        }
+        return reply.optLong("param", -1L)
     }
 
     /** Triggers a photo capture; returns the on-camera SD card path once it's saved. */

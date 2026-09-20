@@ -46,9 +46,17 @@ object YiProtocol {
     // at runtime via MSG_GET_ALL_SETTINGS / MSG_GET_SETTING_CHOICES, since they vary by
     // firmware and model rather than being hardcoded here).
     const val KEY_VIDEO_RESOLUTION = "video_resolution"
+    const val KEY_VIDEO_QUALITY = "video_quality"
     const val KEY_VIDEO_STANDARD = "video_standard"
     const val KEY_SYSTEM_MODE = "system_mode"
     const val KEY_SD_CARD_STATUS = "sd_card_status"
+
+    /** Camera-wide busy/idle indicator (e.g. "idle"), also seen holding a recording state. */
+    const val KEY_APP_STATUS = "app_status"
+
+    // "type" values for MSG_GET_STORAGE_SPACE.
+    const val STORAGE_FREE = "free"
+    const val STORAGE_TOTAL = "total"
 
     /** RTSP URL the live preview is published on once MSG_START_STREAM succeeds. */
     fun rtspUrl(): String = "rtsp://$HOST/live"

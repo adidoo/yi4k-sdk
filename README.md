@@ -49,6 +49,22 @@ times out, capture traffic from the official YI app while it does the same actio
 | 769    | Take a photo                   |
 | 1281   | Delete a file                    |
 
+## Known limitation: no elapsed/remaining recording time
+
+Verified empirically (full `MSG_GET_ALL_SETTINGS` dump polled every 3s over a 24s recording,
+on a real Yi 4K, firmware `Z16V13L_1.10.9`): none of the ~90 returned fields change while
+recording — no elapsed-time counter, no remaining-time or remaining-shots figure. The
+camera's own on-screen estimate is computed locally by its firmware and isn't republished
+over this API. `app_status` does flip to `"record"` while recording, which is how
+`YiCameraController` detects an in-progress recording on (re)connect — but with no way to
+recover *how long* it's already been running.
+
+Consumers wanting a "time remaining" figure have to estimate it themselves from
+`getFreeStorageBytes()`, e.g. by measuring the actual SD-card drain rate during a recording
+(see `yi4k-remote-android`'s `CameraViewModel` for a working example) — a fixed bits-per-pixel
+formula based on resolution/fps is not reliable across modes (this was tried and was off by
+5x+ on a 1080p100 recording).
+
 ## Usage
 
 ```kotlin
