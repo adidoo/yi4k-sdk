@@ -4,3 +4,6 @@ build/
 *.iml
 local.properties
 .DS_Store
+
+# Local project notes for Claude Code sessions (workspace-level, not repo content)
+/.claude/
