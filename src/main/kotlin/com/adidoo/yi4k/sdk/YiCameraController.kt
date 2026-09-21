@@ -78,6 +78,13 @@ class YiCameraController(
         return map
     }
 
+    /** Re-fetches all settings and republishes them on [connectionState] (no-op if disconnected). */
+    suspend fun refreshSettings() {
+        if (_connectionState.value !is CameraConnectionState.Connected) return
+        val settings = fetchAllSettings()
+        _connectionState.value = CameraConnectionState.Connected(settings)
+    }
+
     suspend fun getSettingChoices(key: String): List<String> {
         val request = baseRequest(YiProtocol.MSG_GET_SETTING_CHOICES).put("param", key)
         val reply = client.sendCommand(request) {
