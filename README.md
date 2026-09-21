@@ -83,8 +83,18 @@ val rtspUrl = camera.startLiveView()
 camera.takePhoto()
 camera.startRecording()
 camera.stopRecording()
+
+// The camera reports ~90 settings (mostly undocumented) in one flat map on connect —
+// see CameraConnectionState.Connected.settings above. Reading/writing an individual one:
+val choices = camera.getSettingChoices("video_resolution")   // valid values, if the camera exposes any
+camera.setSetting("video_resolution", choices.first())
+camera.refreshSettings()       // re-fetches the map and republishes it on connectionState
+
 camera.disconnect()
 ```
+
+`yi4k-remote-android`'s advanced settings screen (`CameraSettingCatalog.kt`) has the most
+complete list of real setting keys seen so far, curated from a live Yi 4K.
 
 ## Building
 
